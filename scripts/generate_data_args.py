@@ -54,34 +54,34 @@ def main():
     train_data_group = ", ".join([
         f"{row['Weight']} {TRAIN_START_END} {row['data_prefix']}" for i, row in data_sources.iterrows()
     ])
-    train_data_arg = f"\"TRAIN: {train_data_group}\""
+    train_data_arg = f"\"TRAIN: {train_data_group}\"\n"
     with open(out_path / "train_data_paths.txt", 'w') as f:
         f.write(train_data_arg)
 
     # Validation and test
-    def get_grouped_args(split_arg: str):
+    def get_grouped_args(split_arg: str, split_name):
         # 1 group for each source, and the global group with weights
         global_data_group = ", ".join([
             f"{row['Weight']} {split_arg} {row['data_prefix']}" for i, row in data_sources.iterrows()
         ])
-        global_data_arg = f"\"VALID all_sources_weighted: {global_data_group}\""
+        global_data_arg = f"\"{split_name}_all_sources_weighted: {global_data_group}\""
 
         data_args = [
-            f"\"VALID {row['Data-source'].replace(' ', '_')}: 1 {split_arg} {row['data_prefix']}\"" for i, row in data_sources_no_issues.iterrows()
+            f"\"{split_name}_{row['Data-source'].replace(' ', '_')}: 1 {split_arg} {row['data_prefix']}\"" for i, row in data_sources_no_issues.iterrows()
         ]
         # 1 group for all issues-shards.
         issues_data_group = ", ".join(
             f"1 {split_arg} {row['data_prefix']}" for row in issues_shards
         )
-        issues_data_arg = f"\"VALID gh_issues: {issues_data_group}\""
+        issues_data_arg = f"\"{split_name}_gh_issues: {issues_data_group}\""
 
-        return ' '.join(data_args + [issues_data_arg, global_data_arg])
+        return ' '.join(data_args + [issues_data_arg, global_data_arg]) + "\n"
     
-    valid_data_arg = get_grouped_args(VALID_START_END)
+    valid_data_arg = get_grouped_args(VALID_START_END, "VALID")
     with open(out_path / "valid_data_paths.txt", 'w') as f:
         f.write(valid_data_arg)
 
-    test_data_arg = get_grouped_args(TEST_START_END)
+    test_data_arg = get_grouped_args(TEST_START_END, "TEST")
     with open(out_path / "test_data_paths.txt", 'w') as f:
         f.write(test_data_arg)
     

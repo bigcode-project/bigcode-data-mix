@@ -19,3 +19,10 @@ envsubst < data/valid_data_paths.txt > data/valid_data_paths.txt.tmp
 envsubst < data/test_data_paths.txt > data/test_data_paths.txt.tmp
 ```
 
+In Megatron, pass the following arguments
+```
+--train-weighted-split-paths-path /path/to/train_data_paths.txt.tmp \
+--valid-weighted-split-paths-path /path/to/valid_data_paths.txt.tmp \
+--test-weighted-split-paths-path /path/to/test_data_paths.txt.tmp \
+```
+
