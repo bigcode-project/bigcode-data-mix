@@ -21,7 +21,12 @@ OTHER_SOURCES_PATHS = {
     "notebook structured": f"{DATA_ENV}/jupyter_structured/gpt2-preprocessed_content_document"
 }
 NUM_ISSUES_SHARDS = 8
-
+EXCLUDE_FROM_TEST = [
+    "bluespec",
+    "verilog",
+    "matlab",
+    "augeas"
+]
 
 def main():
     data_sources_path = "data/data_sources.csv"
@@ -59,15 +64,19 @@ def main():
         f.write(train_data_arg)
 
     # Validation and test
-    def get_grouped_args(split_arg: str, split_name):
+    def get_grouped_args(split_arg: str, split_name, exclude_sources=None):
+        if exclude_sources is None:
+            exclude_sources = []
         # 1 group for each source, and the global group with weights
         global_data_group = ", ".join([
-            f"{row['Weight']} {split_arg} {row['data_prefix']}" for i, row in data_sources.iterrows()
+            f"{row['Weight']} {split_arg} {row['data_prefix']}"
+            for i, row in data_sources.iterrows() if row['Data-source'] not in exclude_sources
         ])
         global_data_arg = f"\"{split_name}_all_sources_weighted: {global_data_group}\""
 
         data_args = [
-            f"\"{split_name}_{row['Data-source'].replace(' ', '_')}: 1 {split_arg} {row['data_prefix']}\"" for i, row in data_sources_no_issues.iterrows()
+            f"\"{split_name}_{row['Data-source'].replace(' ', '_')}: 1 {split_arg} {row['data_prefix']}\""
+            for i, row in data_sources_no_issues.iterrows() if row["Data-source"] not in exclude_sources
         ]
         # 1 group for all issues-shards.
         issues_data_group = ", ".join(
@@ -80,8 +89,8 @@ def main():
     valid_data_arg = get_grouped_args(VALID_START_END, "VALID")
     with open(out_path / "valid_data_paths.txt", 'w') as f:
         f.write(valid_data_arg)
-
-    test_data_arg = get_grouped_args(TEST_START_END, "TEST")
+        
+    test_data_arg = get_grouped_args(TEST_START_END, "TEST", exclude_sources=EXCLUDE_FROM_TEST)
     with open(out_path / "test_data_paths.txt", 'w') as f:
         f.write(test_data_arg)
     
