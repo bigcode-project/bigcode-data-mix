@@ -1,6 +1,6 @@
 # bigcode-data-mix
 
-This repository contains scripts related to the data-mix for training.
+This repository contains scripts and files related to the data-mix for training.
 
 ## 1 (optional) - Generate the templates
 Run the following script to generate the data templates: `data/(train/valid/test)_data_paths.txt`
@@ -23,6 +23,5 @@ In Megatron, pass the following arguments
 ```
 --train-weighted-split-paths-path /path/to/train_data_paths.txt.tmp \
 --valid-weighted-split-paths-path /path/to/valid_data_paths.txt.tmp \
---test-weighted-split-paths-path /path/to/test_data_paths.txt.tmp \
 ```
 
